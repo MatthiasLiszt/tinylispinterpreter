@@ -1,5 +1,6 @@
 
 var repl = require('repl');
+var eval = require("./eval");
 var reader = require("./reader")
 
 
@@ -14,7 +15,11 @@ repl.start({
                      reader.toRead.tok=token; // initialization of toRead in module reader
                      reader.toRead.i=0; // index must be set too
                      var p=reader.readForm();
-                     console.log(JSON.stringify(p));
+                     //console.log(JSON.stringify(p));
+                     p=reader.normalize(p);
+                     console.log("normalized: "+JSON.stringify(p)); 
+                     var ae=eval.evaluate(p,eval.replEnv);
+                     console.log("after evaluation : "+JSON.stringify(ae));
                      callback(null); // 2b changed
            } 
 });

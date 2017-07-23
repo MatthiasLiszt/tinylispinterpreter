@@ -59,7 +59,7 @@ var readAtom = function (input,i){
                 console.log("executing readAtom "); 
                 if(number.test(input[i]))
                  {console.log("readAtom: INTEGER "+input[i]);
-                  var r={type: "INTEGER", value: input[i]};
+                  var r={type: "INTEGER", value: parseInt(input[i]) };
                   return r;
                  }  
                 if(symbol.test(input[i]))
@@ -93,9 +93,16 @@ var readForm = function (){
                 
                };
 
+var normalize = function (a){ // gets rid of those ,null in an array 
+                  var r=[],i=0;
+                  while((a[i]!==undefined)&&(a[i]!==null))
+                   {r.push(a[i]);++i;} 
+                  return r;
+                };
+
 module.exports = ({tokenize: tokenize,parenOrAtom: parenOrAtom,
                    readList: readList, readForm: readForm, readAtom: readAtom,
-                   toRead: toRead  });
+                   toRead: toRead, normalize: normalize });
 
 
 
