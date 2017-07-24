@@ -4,6 +4,7 @@ var eval = require("./eval");
 var reader = require("./reader")
 
 
+
 //probably this will contain the whole repl loop 
 repl.start({
      prompt: "code>" ,
@@ -18,7 +19,7 @@ repl.start({
                      //console.log(JSON.stringify(p));
                      p=reader.normalize(p);
                      console.log("normalized: "+JSON.stringify(p)); 
-                     var ae=eval.evaluate(p,eval.replEnv);
+                     var ae=eval.evaluate(p,0);
                      console.log("after evaluation : "+JSON.stringify(ae));
                      callback(null); // 2b changed
            } 

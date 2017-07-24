@@ -31,28 +31,23 @@ var evaluate = function (tt,env){
                                            lpush=i;
                                            t=tt[i];}
                  if(t[i].type=="SYMBOL")  
-                  {if(fset) 
-                    {param[pI]=i;
-                     ++pI;
-                    }
-                   if(!fset) 
-                    {if(envFind(t[i].value,env)!="error!")
-                      {console.log(t[i].value+" exists in env. !");
-                       fset=true;
-                       f=i;//index of SYMBOL
-                       pI=0; 
-                      }
-                     else
-                      {console.log("unknown SYMBOL detected !!!");
-                       return "error!unknown SYMBOL!";  
-                      }  
-                    }
-                   
+                  {f=i;//index of SYMBOL
+                   fset=true;
+                   //param.fill(0);
+                   param[0]=-1;
+                   param[1]=-1;
+                   pI=0;
                   }           
-                 if( t[i].type=="INTEGER" )                                      
+                 if( (t[i].type=="INTEGER") && fset)                                      
                   {param[pI]=i;
+                   //param.push(t[i].value);
                    ++pI;}
-                                                   
+                 if( (t[i].type=="INTEGER") && !fset)
+                  {//param.fill(0);
+                   param[0]=-1;
+                   param[1]=-1;  
+                   pI=0;
+                  }                                       
                  if(pI==2)
                   {var ff=environment[env][t[f].value];
                    console.log("operation "+t[f].value+" "+t[param[0]].value+
@@ -70,7 +65,7 @@ var evaluate = function (tt,env){
 
 
 function envSet(s,m,e){environment[e][s]=m;
-                              return m;};
+                              };
 function envFind(s,e){for(var x in environment[e])
                                 {if(x==s)
                                   {return e;}
