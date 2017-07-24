@@ -2,6 +2,8 @@
 var environment=[];
 var curEnv; //index of current Environment
 
+var rParam=2; // required parameters of a Function (not yet fully implemented)
+
 var replEnv = {};
 
 replEnv['+'] = function(a,b){return a+b;};
@@ -10,9 +12,13 @@ replEnv['*'] = function(a,b){return a*b;};
 replEnv['/'] = function(a,b){return a/b;};
 
 replEnv["def!"]=function(a,b){console.log("def ! executed with "+a+" "+b);
-                              envSet(a,b,curEnv);};
+                              return envSet(a,b,curEnv);};
 
 environment.push(replEnv);
+
+function isFunction(x) {
+  return Object.prototype.toString.call(x) == '[object Function]';
+}
 
 var evaluate = function (tt,env){
                 var i=0;
@@ -52,9 +58,24 @@ var evaluate = function (tt,env){
                  if( t[i].type=="INTEGER" )                                      
                   {param[pI]=i;
                    ++pI;}
-                                                   
-                 if(pI==2)
+                          
+                 if(isFunction(environment[env][t[f].value])) // if SYMBOL is a function        
                   {var ff=environment[env][t[f].value];
+                   console.log(t[f].value+" is a function");     
+                   rParam=2; // currently all functions have 2 parameters 
+                  }      
+                 else
+                  {console.log(t[f].value+" is a value");     
+                   rParam=0;}// to be changed ... currently only SYMBOLS without func. 
+                     
+                 if((rParam==0)&&(pI==0))            
+                  {var pval=environment[env][t[f].value];
+                   var nt={type: "INTEGER", value: pval};   
+                   console.log("value "+t[f].value+" "+pval);
+                   ntok.push(nt);
+                  }
+                 if((rParam==2)&&(pI==2))
+                  {//var ff=environment[env][t[f].value];
                    console.log("operation "+t[f].value+" "+t[param[0]].value+
                                " "+t[param[1]].value);
                    //console.log("env structure: "+JSON.stringify(environment));
