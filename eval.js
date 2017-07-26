@@ -21,32 +21,66 @@ function isFunction(x) {
 }
 
 var evaluate = function (tt,env){
-                var i=0;
+                var i=0,y=0;
                 var fset=false;
                 var param=[];
                 var t,f,pI=0,lpush=0;
                 var ntok=[];
+                var nImmuts=[];//useless new immutables 
+                var nI=0;// index for useless new immutables
                 
                 curEnv=env;// added in step 3
-         
-                while(tt[i]!==undefined){
-                 t=tt; 
-                 if(Array.isArray(t[i])){for(var k=lpush;k<i;++k)
+                
+                console.log("eval: trying to evaluate "+JSON.stringify(tt));  
+                   
+                t=tt;               
+
+                while(t[y]!==undefined){
+                 if(Array.isArray(t[y])){for(var k=lpush;k<i;++k)
                                               {ntok.push(t[k]);
                                               }  
                                            lpush=i;
-                                           t=tt[i];}
-                 if(t[i].type=="SYMBOL")  
+                                           fset=false;
+                                           pI=0;
+                                           console.log(" FSET set to false !!!");  
+                                           t=t[y];
+                                           y=0;
+                                          }
+                 console.log(" current value to test "+t[y].value);    
+                 if(t[y].type=="SYMBOL")  
                   {if(fset) 
-                    {param[pI]=i;
-                     ++pI;
+                    {if(envFind(t[y].value,env)!="error!")
+                      {var pval=environment[env][t[y].value];
+                       nImmuts.push(pval);
+                       console.log("parameter was "+pval+" and is "+nImmuts[param[pI]]);
+                      }
+                     else
+                      {nImmuts.push(t[y].value);
+                       console.log("string pushed as "+nImmuts[param[pI]]);
+                      }
+                     param[pI]=nI;
+                     ++nI; 
+                     ++pI; 
+                     
                     }
                    if(!fset) 
-                    {if(envFind(t[i].value,env)!="error!")
-                      {console.log(t[i].value+" exists in env. !");
-                       fset=true;
-                       f=i;//index of SYMBOL
-                       pI=0; 
+                    {if(envFind(t[y].value,env)!="error!")
+                      {console.log(t[y].value+" exists in env. !");
+                       if(isFunction(environment[env][t[y].value])) // if SYMBOL is a function     
+                        {fset=true;
+                         f=y;//index of SYMBOL
+                         pI=0;
+                         var ff=environment[env][t[f].value];
+                         console.log(t[f].value+" is a function");     
+                         rParam=2; // currently all functions have 2 parameters  
+                               
+                        }
+                       else
+                        {console.log(t[y].value+" is a value");     
+                         var pval=environment[env][t[y].value];
+                         ntok.push(pval);
+                         console.log(pval+" pushed");
+                        } 
                       }
                      else
                       {console.log("unknown SYMBOL detected !!!");
@@ -55,34 +89,30 @@ var evaluate = function (tt,env){
                     }
                    
                   }           
-                 if( t[i].type=="INTEGER" )                                      
-                  {param[pI]=i;
-                   ++pI;}
-                          
-                 if(isFunction(environment[env][t[f].value])) // if SYMBOL is a function        
-                  {var ff=environment[env][t[f].value];
-                   console.log(t[f].value+" is a function");     
-                   rParam=2; // currently all functions have 2 parameters 
-                  }      
-                 else
-                  {console.log(t[f].value+" is a value");     
-                   rParam=0;}// to be changed ... currently only SYMBOLS without func. 
-                     
-                 if((rParam==0)&&(pI==0))            
-                  {var pval=environment[env][t[f].value];
-                   var nt={type: "INTEGER", value: pval};   
-                   console.log("value "+t[f].value+" "+pval);
-                   ntok.push(nt);
+                 if( t[y].type=="INTEGER" )                                      
+                  {param[pI]=nI;
+                   nImmuts.push(t[y].value)
+                   console.log("INTEGER detected and pushed "+nImmuts[param[pI]]);
+                   console.log("     y "+y+" t[y].value "+t[y].value);
+                   console.log(" nI : "+param[0]+" "+param[1]);
+                   ++nI;
+                   ++pI;
+                   
                   }
+                 
+                                                               
                  if((rParam==2)&&(pI==2))
-                  {//var ff=environment[env][t[f].value];
-                   console.log("operation "+t[f].value+" "+t[param[0]].value+
-                               " "+t[param[1]].value);
+                  {var ff=environment[env][t[f].value];
+                   console.log("operation "+t[f].value+" "+nImmuts[param[0]]+
+                               " "+nImmuts[param[1]]);
                    //console.log("env structure: "+JSON.stringify(environment));
-                   var nt={type: "INTEGER", value: ff(t[param[0]].value,t[param[1]].value)};
+                   var nt={type: "INTEGER", value: ff(nImmuts[param[0]],nImmuts[param[1]])};
                    ntok.push(nt);
+                   console.log("nImmuts-debug nI="+nI);
+                   nImmuts.map(function(x){console.log(" "+x)});
                   } 
                  ++i;
+                 ++y;
                 }  
                 return ntok;
                };
