@@ -1,0 +1,26 @@
+
+var repl = require('repl');
+var eval = require("./eval");
+var reader = require("./reader")
+
+
+
+//probably this will contain the whole repl loop 
+repl.start({
+     prompt: "code>" ,
+     eval: function(cmd, context, filename, callback){
+                     console.log("to be processed "+cmd);
+                     var token=reader.tokenize(cmd);
+                     console.log("tokenized "+token);
+                     //reader.parenOrAtom(token);
+                     reader.toRead.tok=token; // initialization of toRead in module reader
+                     reader.toRead.i=0; // index must be set too
+                     var p=reader.readForm();
+                     //console.log(JSON.stringify(p));
+                     p=reader.normalize(p);
+                     console.log("normalized: "+JSON.stringify(p)); 
+                     //var ae=eval.evaluate(p,0);
+                     // console.log("after evaluation : "+JSON.stringify(ae));
+                     callback(null); // 2b changed
+           } 
+});

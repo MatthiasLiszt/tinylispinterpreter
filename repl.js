@@ -10,17 +10,9 @@ repl.start({
      prompt: "code>" ,
      eval: function(cmd, context, filename, callback){
                      console.log("to be processed "+cmd);
-                     var token=reader.tokenize(cmd);
-                     console.log("tokenized "+token);
-                     //reader.parenOrAtom(token);
-                     reader.toRead.tok=token; // initialization of toRead in module reader
-                     reader.toRead.i=0; // index must be set too
-                     var p=reader.readForm();
-                     //console.log(JSON.stringify(p));
-                     p=reader.normalize(p);
-                     console.log("normalized: "+JSON.stringify(p)); 
-                     var ae=eval.evaluate(p,0);
-                     console.log("after evaluation : "+JSON.stringify(ae));
+                     var p=reader.readString(cmd);
+                     //reader.printString();
+                     console.log("from REPL : "+JSON.stringify(p)); 
                      callback(null); // 2b changed
            } 
 });
