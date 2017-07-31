@@ -1,4 +1,4 @@
-
+ 
 var environment=[];
 var curEnv; //index of current Environment
 
@@ -24,13 +24,93 @@ function isFunction(x) {
   return Object.prototype.toString.call(x) == '[object Function]';
 }
 
-var evaluate = function (tt,env){
-                var el=tt[0];
-
-               
-               };
 
 // complete rewrite after looking at Paul Graham's Evaluator and reading Norvig's interpreter
+var evaluate = function (tt,env){
+                var nt=[]; // to become the return value of function  
+                
+               
+               function evaluu(tt,env,y){ // wrapping the function   
+                var t=tt;
+                var el=t[y];
+                if(Array.isArray(el))
+                  {console.log(" list detected");
+                   console.log(JSON.stringify(el));  
+                   t=el;el=t[0];y=0;
+                  }
+                if(isAtom(el)) 
+                 {if(el.type=="INTEGER")
+                   {nt.push(el);
+                    console.log(el.value +" added to nt");
+                    ++y; //index for adding atom elements   
+                    evaluu(t,env,y);   
+                   }
+                  if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
+                   {var pval=environment[env][el.value];
+                    console.log("function found "+el.value)
+                    if(isExecutable(t))
+                     {console.log("executable");
+                      printList(t);
+                      ++y; //index for adding atom elements   
+                      if(t.length==3)  // to be changed ; for 2 arguments only
+                       {console.log(pval(t[1].value,t[2].value));
+                        var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
+                        nt.push(nxp); 
+                       }
+                      else
+                       {console.log("currently 2 arguments only");}                         
+                     }
+                    else
+                     {console.log(" nested -- next list : ");
+                      nt.push(el);
+                      //var nl=getNextList(t);
+                      //printList(t[nl]);
+                      ++y; //index for adding atom elements  
+                      evaluu(t,env,y);
+                      
+                     } 
+                     
+                   }
+                  else
+                   {console.log("not a function");} 
+                 }
+                }
+                evaluu(tt,env,0);
+                console.log("evaluate finished ");
+                console.log(JSON.stringify(nt));
+                return nt;
+               };
+
+
+
+function getNextList(x){
+ var i;
+ for(i=0;i<x.length;++i) 
+  {if(Array.isArray(x[i]))
+    {return i;} 
+  }
+ return undefined; // returns undefined when there is no other list
+}
+
+
+function isExecutable(x){ // checks if there are no more "nested" parameters 
+  var i=0;
+ 
+  console.log("executing isExecutable x.length "+x.length); 
+ 
+  for(i=0;i<x.length;++i)
+   {if(Array.isArray(x[i])){return false;}
+   }
+  return true;
+}
+
+function printList(x){
+ var i=0;
+ var p=[];
+
+ for(i=0;i<x.length;++i){p.push(x[i]);}
+ console.log(JSON.stringify(p));
+}
 
 
 function envSet(s,m,e){environment[e][s]=m;
@@ -56,5 +136,10 @@ function envGet(s,e){var en;
                               {return en;}
                             };
 
+function isAtom(x){
+         if(x.type=="INTEGER"){return true;} 
+         if(x.type=="SYMBOL"){return true;}   
+         return false;
+  }
 
-module.exports = ({evaluate: evaluate,replEnv: replEnv});
+module.exports = ({evaluate: evaluate});

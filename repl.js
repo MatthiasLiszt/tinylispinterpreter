@@ -13,6 +13,7 @@ repl.start({
                      var p=reader.readString(cmd);
                      //reader.printString();
                      console.log("from REPL : "+JSON.stringify(p)); 
+                     eval.evaluate(p,0);
                      callback(null); // 2b changed
            } 
 });
