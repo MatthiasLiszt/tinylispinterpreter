@@ -19,6 +19,7 @@ replEnv['nil']=function(){return false;}
 
 environment.push(replEnv);
 
+<<<<<<< HEAD
 // after days of disappointment I finally decided to somehow copy the reader functions
 var evaluate = function (t,env){
                  
@@ -67,6 +68,54 @@ var evaluate = function (t,env){
                          }
                         else
                          {console.log("currently 2 arguments only");}        
+=======
+function isFunction(x) {
+  return Object.prototype.toString.call(x) == '[object Function]';
+}
+
+
+// complete rewrite after looking at Paul Graham's Evaluator and reading Norvig's interpreter
+var evaluate = function (tt,env){
+                var nt=[];
+               
+               function evaluu(tt,env,y,vl){ // wrapping the function   
+                var t=tt;
+                var el=t[y];
+                
+
+                if(el===undefined)
+                 {console.log("current el is undefined");
+                  return vl; 
+                 } 
+                if(Array.isArray(el))
+                  {console.log(" list detected");
+                   console.log(JSON.stringify(el));
+                   var vnl=[];  
+                   var oT=t,oY=y,oVl=vl; //saving old values
+                   t=el;el=t[0];y=0;  
+                   vl=vnl; //starting a new list                         
+                  }
+                if(isAtom(el)) 
+                 {if(el.type=="INTEGER")
+                   {console.log(el.value+" added to vl");
+                    vl.push(el);
+                    ++y; //index for adding atom elements   
+                     evaluu(t,env,y,vl);
+                    
+                   }
+                  if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
+                   {var pval=environment[env][el.value];
+                    console.log("function found "+el.value)
+                    if(isExecutable(t))
+                     {console.log("executable");
+                      printList(t);
+                      ++y; //index for adding atom elements   
+                      if(t.length==3)  // to be changed ; for 2 arguments only
+                       {console.log(pval(t[1].value,t[2].value));
+                        var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
+                        oVl.push(nxp); 
+                        return evaluu(oT,env,++oY,oVl); // virtually goes up the tree again
+>>>>>>> b18ede7f78f269dd1ef2795932cfbb9c7c0bab77
                        }
                       else 
                        {atom=evalForm(t,env,i);
@@ -79,12 +128,33 @@ var evaluate = function (t,env){
                       ++i;
                       nterm.push(atom);
                      }
+<<<<<<< HEAD
+=======
+                    else
+                     {console.log(" nested -- next list : ");
+                      vl.push(el);
+                      ++y; //index for adding atom elements  
+                      vl.push(evaluu(t,env,y,vl));
+                      console.log("logical end");
+                      printList(vl);
+                      return vl;
+                     } 
+                     
+>>>>>>> b18ede7f78f269dd1ef2795932cfbb9c7c0bab77
                    }
                   console.log("nterm created "+JSON.stringify(nterm));
                   return nterm;
                  }
+<<<<<<< HEAD
 
                  return evalList(t,env);   
+=======
+                }
+                nt=evaluu(tt,env,0,nt);
+                console.log("evaluate finished ");
+                console.log(JSON.stringify(nt));
+                return nt;
+>>>>>>> b18ede7f78f269dd1ef2795932cfbb9c7c0bab77
                };
 
 

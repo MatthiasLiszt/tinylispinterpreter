@@ -33,6 +33,11 @@ var evaluate = function (tt,env){
                function evaluu(tt,env,y){ // wrapping the function   
                 var t=tt;
                 var el=t[y];
+<<<<<<< HEAD
+=======
+                
+
+>>>>>>> b18ede7f78f269dd1ef2795932cfbb9c7c0bab77
                 if(el===undefined)
                  {console.log("current el is undefined");
                   return 0; 
@@ -41,11 +46,21 @@ var evaluate = function (tt,env){
                   {console.log(" list detected");
                    console.log(JSON.stringify(el));  
                    var oT=t,oY=y; //saving old values
+<<<<<<< HEAD
                    t=el;el=t[0];y=0;                             
                   }
                 if(isAtom(el)) 
                  {if(el.type=="INTEGER")
                    {nt.push(el);
+=======
+                   t=el;el=t[0];y=0;  
+                                            
+                  }
+                if(isAtom(el)) 
+                 {if(el.type=="INTEGER")
+                   {
+                    nt.push(el);
+>>>>>>> b18ede7f78f269dd1ef2795932cfbb9c7c0bab77
                     console.log(el.value +" added to nt");
                     ++y; //index for adding atom elements   
                     return evaluu(t,env,y);   
@@ -69,8 +84,11 @@ var evaluate = function (tt,env){
                     else
                      {console.log(" nested -- next list : ");
                       nt.push(el);
+<<<<<<< HEAD
                       //var nl=getNextList(t);
                       //printList(t[nl]);
+=======
+>>>>>>> b18ede7f78f269dd1ef2795932cfbb9c7c0bab77
                       ++y; //index for adding atom elements  
                       return evaluu(t,env,y);
                       
