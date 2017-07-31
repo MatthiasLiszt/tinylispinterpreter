@@ -27,32 +27,32 @@ function isFunction(x) {
 
 // complete rewrite after looking at Paul Graham's Evaluator and reading Norvig's interpreter
 var evaluate = function (tt,env){
-                var nt=[];
+                var nt=[]; // to become the return value of function  
+                
                
-               function evaluu(tt,env,y,vl){ // wrapping the function   
+               function evaluu(tt,env,y){ // wrapping the function   
                 var t=tt;
                 var el=t[y];
                 
 
                 if(el===undefined)
                  {console.log("current el is undefined");
-                  return vl; 
+                  return 0; 
                  } 
                 if(Array.isArray(el))
                   {console.log(" list detected");
-                   console.log(JSON.stringify(el));
-                   var vnl=[];  
-                   var oT=t,oY=y,oVl=vl; //saving old values
+                   console.log(JSON.stringify(el));  
+                   var oT=t,oY=y; //saving old values
                    t=el;el=t[0];y=0;  
-                   vl=vnl; //starting a new list                         
+                                            
                   }
                 if(isAtom(el)) 
                  {if(el.type=="INTEGER")
-                   {console.log(el.value+" added to vl");
-                    vl.push(el);
+                   {
+                    nt.push(el);
+                    console.log(el.value +" added to nt");
                     ++y; //index for adding atom elements   
-                     evaluu(t,env,y,vl);
-                    
+                    return evaluu(t,env,y);   
                    }
                   if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
                    {var pval=environment[env][el.value];
@@ -64,20 +64,18 @@ var evaluate = function (tt,env){
                       if(t.length==3)  // to be changed ; for 2 arguments only
                        {console.log(pval(t[1].value,t[2].value));
                         var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
-                        oVl.push(nxp); 
-                        return evaluu(oT,env,++oY,oVl); // virtually goes up the tree again
+                        nt.push(nxp); 
+                        return evaluu(oT,env,++oY); // virtually goes up the tree again
                        }
                       else
                        {console.log("currently 2 arguments only");}                         
                      }
                     else
                      {console.log(" nested -- next list : ");
-                      vl.push(el);
+                      nt.push(el);
                       ++y; //index for adding atom elements  
-                      vl.push(evaluu(t,env,y,vl));
-                      console.log("logical end");
-                      printList(vl);
-                      return vl;
+                      return evaluu(t,env,y);
+                      
                      } 
                      
                    }
@@ -85,7 +83,7 @@ var evaluate = function (tt,env){
                    {console.log("not a function");} 
                  }
                 }
-                nt=evaluu(tt,env,0,nt);
+                evaluu(tt,env,0);
                 console.log("evaluate finished ");
                 console.log(JSON.stringify(nt));
                 return nt;
