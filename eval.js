@@ -1,4 +1,3 @@
- 
 var environment=[];
 var curEnv; //index of current Environment
 
@@ -20,74 +19,78 @@ replEnv['nil']=function(){return false;}
 
 environment.push(replEnv);
 
-function isFunction(x) {
-  return Object.prototype.toString.call(x) == '[object Function]';
-}
-
-
-// complete rewrite after looking at Paul Graham's Evaluator and reading Norvig's interpreter
-var evaluate = function (tt,env){
-                var nt=[]; // to become the return value of function  
-                
-               
-               function evaluu(tt,env,y){ // wrapping the function   
-                var t=tt;
-                var el=t[y];
-                if(el===undefined)
-                 {console.log("current el is undefined");
-                  return 0; 
-                 } 
-                if(Array.isArray(el))
-                  {console.log(" list detected");
-                   console.log(JSON.stringify(el));  
-                   var oT=t,oY=y; //saving old values
-                   t=el;el=t[0];y=0;                             
-                  }
-                if(isAtom(el)) 
-                 {if(el.type=="INTEGER")
-                   {nt.push(el);
-                    console.log(el.value +" added to nt");
-                    ++y; //index for adding atom elements   
-                    return evaluu(t,env,y);   
-                   }
-                  if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
-                   {var pval=environment[env][el.value];
-                    console.log("function found "+el.value)
-                    if(isExecutable(t))
-                     {console.log("executable");
-                      printList(t);
-                      ++y; //index for adding atom elements   
-                      if(t.length==3)  // to be changed ; for 2 arguments only
-                       {console.log(pval(t[1].value,t[2].value));
-                        var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
-                        nt.push(nxp); 
-                        return evaluu(oT,env,++oY); // virtually goes up the tree again
-                       }
-                      else
-                       {console.log("currently 2 arguments only");}                         
-                     }
+// after days of disappointment I finally decided to somehow copy the reader functions
+var evaluate = function (t,env){
+                 
+                                 
+                 function evalForm(t,env,i){
+                  
+                  if(t[i]!==undefined)
+                   {if(Array.isArray(t[i]))
+                     {console.log("evalList started ");
+                      return evalList(t[i],env);} 
                     else
-                     {console.log(" nested -- next list : ");
-                      nt.push(el);
-                      //var nl=getNextList(t);
-                      //printList(t[nl]);
-                      ++y; //index for adding atom elements  
-                      return evaluu(t,env,y);
-                      
-                     } 
-                     
-                   }
-                  else
-                   {console.log("not a function");} 
+                     {return evalAtom(t,env,i);}
+                   }     
+                 }     
+
+                 function evalAtom(t,env,i){
+                   var el=t[i];
+                   if(isAtom(el))
+                    {if(el.type=="INTEGER")
+                      {return el;}
+                     if(el.type=="SYMBOL")   
+                      {return el;}
+                    }    
+                   else
+                    {console.log("error! unknown character !");}     
                  }
-                }
-                evaluu(tt,env,0);
-                console.log("evaluate finished ");
-                console.log(JSON.stringify(nt));
-                return nt;
+                 
+                 function evalList(t,env){
+                   var nterm=[];
+                   var atom;
+                   var i=0,el;
+                   
+                  while(t[i]!==undefined)  
+                   {el=t[i];
+                    if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
+                     {var pval=environment[env][el.value];
+                      console.log("function found "+el.value)
+                      if(isExecutable(t))
+                       {console.log("executable");
+                        printList(t);
+                        if(t.length==3)  // to be changed ; for 2 arguments only
+                         {console.log(pval(t[i+1].value,t[i+2].value));
+                          var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
+                          nterm.push(nxp);
+                          i+=3;
+                         }
+                        else
+                         {console.log("currently 2 arguments only");}        
+                       }
+                      else 
+                       {atom=evalForm(t,env,i);
+                        ++i;
+                        nterm.push(atom);
+                       } 
+                     }  
+                    else 
+                     {atom=evalForm(t,env,i);
+                      ++i;
+                      nterm.push(atom);
+                     }
+                   }
+                  console.log("nterm created "+JSON.stringify(nterm));
+                  return nterm;
+                 }
+
+                 return evalList(t,env);   
                };
 
 
+function isFunction(x) {
+  return Object.prototype.toString.call(x) == '[object Function]';
+}
 
 function getNextList(x){
  var i;
