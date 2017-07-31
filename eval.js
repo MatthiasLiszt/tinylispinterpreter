@@ -33,17 +33,22 @@ var evaluate = function (tt,env){
                function evaluu(tt,env,y){ // wrapping the function   
                 var t=tt;
                 var el=t[y];
+                if(el===undefined)
+                 {console.log("current el is undefined");
+                  return 0; 
+                 } 
                 if(Array.isArray(el))
                   {console.log(" list detected");
                    console.log(JSON.stringify(el));  
-                   t=el;el=t[0];y=0;
+                   var oT=t,oY=y; //saving old values
+                   t=el;el=t[0];y=0;                             
                   }
                 if(isAtom(el)) 
                  {if(el.type=="INTEGER")
                    {nt.push(el);
                     console.log(el.value +" added to nt");
                     ++y; //index for adding atom elements   
-                    evaluu(t,env,y);   
+                    return evaluu(t,env,y);   
                    }
                   if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
                    {var pval=environment[env][el.value];
@@ -56,6 +61,7 @@ var evaluate = function (tt,env){
                        {console.log(pval(t[1].value,t[2].value));
                         var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
                         nt.push(nxp); 
+                        return evaluu(oT,env,++oY); // virtually goes up the tree again
                        }
                       else
                        {console.log("currently 2 arguments only");}                         
@@ -66,7 +72,7 @@ var evaluate = function (tt,env){
                       //var nl=getNextList(t);
                       //printList(t[nl]);
                       ++y; //index for adding atom elements  
-                      evaluu(t,env,y);
+                      return evaluu(t,env,y);
                       
                      } 
                      
