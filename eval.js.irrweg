@@ -60,47 +60,50 @@ var evaluate = function (t,env){
                   while(t[i]!==undefined)  
                    {el=t[i];
                     if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
-                     {var pval=environment[env][el.value];
+                     {
                       console.log("function found "+el.value)
                       if(isExecutable(t))
                        {console.log("executable");
+                        var pval=environment[env][el.value];
                         printList(t);
                         if(t.length==3)  // to be changed ; for 2 arguments only
                          {var a,b;
                           if(t[1].type=="SYMBOL"){a=parseInt(environment[env][t[1].value]);}
                           if(t[2].type=="SYMBOL"){b=parseInt(environment[env][t[2].value]);}   
                           if(t[1].type=="INTEGER"){a=t[1].value;}      
-                          if(t[2].type=="INTEGER"){b=t[2].value;} 
+                          if(t[2].type=="INTEGER"){b=t[2].value;}       
                           var nxp={type: "INTEGER", value: pval(a,b)};
+                          console.log("apply "+a+" "+b+" to "+el.value);  
                           nterm.push(nxp);
                           console.log("nxp "+JSON.stringify(nxp));
-                          i+=3;
+                          i+=3; 
                          }
                         else
-                         {console.log("currently 2 arguments only");
-                          throw "too many arguments";
-                         }        
+                         {console.log("currently 2 arguments only");}        
                        }
                       else 
-                       {atom=evalForm(t,env,i);
-                        ++i;
+                       {console.log("not executable but reads atom");
+                        atom=evalForm(t,env,i);
+                        ++i; 
                         nterm.push(atom);
                        } 
                      }  
                     else 
-                     {if(el.value=="define")
+                     {if((el.type=="SYMBOL")&&(el.value=="define"))
                        {console.log("define detected");
                         envSet(t[1].value,t[2].value,env);
                         nterm.push(t[2]);
                         i+=3;
-                        return nterm;
-                       } 
-                      console.log(t[i].type) ;
-                      //if((t[i].type=="INTEGER")||(t[i].type=="SYMBOL"))  
+                       }
+                      if(el.type=="INTEGER")
+                       {console.log("reads INTEGER "+el.value)
                         atom=evalForm(t,env,i);
                         ++i;
                         nterm.push(atom);
-                         
+                       }   
+                      if(el.type=="SYMBOL")
+                       {console.log(el.value+" not in environment");
+                       }   
                      }
                    }
                   console.log("nterm created "+JSON.stringify(nterm));
@@ -113,8 +116,7 @@ var evaluate = function (t,env){
                  {var old=evalList(nevv,env);
                   var nevv=evalList(old,env);
                  }  
-                                             
-                //var old=evalList(nevv,env);    
+                                               
                 //console.log("no further simplifications possible");
                 return old;                 
                };
@@ -160,7 +162,7 @@ function envFind(s,e){for(var x in environment[e])
                                 {if(x==s)
                                   {return e;}
                                 }
-                               console.log(s+" not found! error!"); 
+                               //console.log(s+" not found! error!"); 
                                return "error!";
                              };
 

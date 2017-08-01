@@ -66,20 +66,13 @@ var evaluate = function (t,env){
                        {console.log("executable");
                         printList(t);
                         if(t.length==3)  // to be changed ; for 2 arguments only
-                         {var a,b;
-                          if(t[1].type=="SYMBOL"){a=parseInt(environment[env][t[1].value]);}
-                          if(t[2].type=="SYMBOL"){b=parseInt(environment[env][t[2].value]);}   
-                          if(t[1].type=="INTEGER"){a=t[1].value;}      
-                          if(t[2].type=="INTEGER"){b=t[2].value;} 
-                          var nxp={type: "INTEGER", value: pval(a,b)};
+                         {console.log(pval(t[i+1].value,t[i+2].value));
+                          var nxp={type: "INTEGER", value: pval(t[1].value,t[2].value)};
                           nterm.push(nxp);
-                          console.log("nxp "+JSON.stringify(nxp));
                           i+=3;
                          }
                         else
-                         {console.log("currently 2 arguments only");
-                          throw "too many arguments";
-                         }        
+                         {console.log("currently 2 arguments only");}        
                        }
                       else 
                        {atom=evalForm(t,env,i);
@@ -88,19 +81,9 @@ var evaluate = function (t,env){
                        } 
                      }  
                     else 
-                     {if(el.value=="define")
-                       {console.log("define detected");
-                        envSet(t[1].value,t[2].value,env);
-                        nterm.push(t[2]);
-                        i+=3;
-                        return nterm;
-                       } 
-                      console.log(t[i].type) ;
-                      //if((t[i].type=="INTEGER")||(t[i].type=="SYMBOL"))  
-                        atom=evalForm(t,env,i);
-                        ++i;
-                        nterm.push(atom);
-                         
+                     {atom=evalForm(t,env,i);
+                      ++i;
+                      nterm.push(atom);
                      }
                    }
                   console.log("nterm created "+JSON.stringify(nterm));
@@ -113,8 +96,7 @@ var evaluate = function (t,env){
                  {var old=evalList(nevv,env);
                   var nevv=evalList(old,env);
                  }  
-                                             
-                //var old=evalList(nevv,env);    
+                                               
                 //console.log("no further simplifications possible");
                 return old;                 
                };
