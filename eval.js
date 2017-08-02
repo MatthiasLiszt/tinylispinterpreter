@@ -65,6 +65,14 @@ var evaluate = function (t,env){
                       if(isExecutable(t))
                        {console.log("executable");
                         printList(t);
+                        if(t.length==1) // parameterless function or variable
+                         {var aa=parseInt(environment[env][t[0].value]);
+                          var nxp={type: "INTEGER", value: aa};
+                          nterm.push(nxp);
+                          console.log("variable detected");                 
+                          console.log("nxp "+JSON.stringify(nxp));
+                          return nterm;
+                         }    
                         if(t.length==3)  // to be changed ; for 2 arguments only
                          {var a,b;
                           if(t[1].type=="SYMBOL"){a=parseInt(environment[env][t[1].value]);}
@@ -76,7 +84,7 @@ var evaluate = function (t,env){
                           console.log("nxp "+JSON.stringify(nxp));
                           i+=3;
                          }
-                        else
+                        if(t.length>3)
                          {console.log("currently 2 arguments only");
                           throw "too many arguments";
                          }        
