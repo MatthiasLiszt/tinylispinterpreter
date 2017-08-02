@@ -95,6 +95,43 @@ var evaluate = function (t,env){
                         i+=3;
                         return nterm;
                        } 
+                      if (el.value=="if")
+                       {console.log("define if");
+                        if(t[1].value===undefined)
+                         {console.log("if is not yet executable ");}
+                        else
+                         {if(t[1].type=="INTEGER")
+                            { console.log("if is probably exectuable");
+                               console.log("simplified if condition "+t[1].value);
+                               if(t[1].value==0)
+                                 {console.log("if condition is FALSE");
+                                   nterm.push(t[3]);
+                                   return nterm;
+                                 }
+                              else
+                                {console.log("if condition is TRUE");
+                                  nterm.push(t[2]);
+                                  return nterm;
+                                }
+                            }
+                            else
+                              {console.log("probably variable not replaced by value");
+                                var rp=parseInt(environment[env][t[1].value]);
+                                
+                                console.log("variable in >>if<< replaced by "+rp);
+                                if(rp==0)
+                                 {console.log("if condition is FALSE");
+                                   nterm.push(t[3]);
+                                   return nterm;
+                                 }
+                               else
+                                {console.log("if condition is TRUE");
+                                  nterm.push(t[2]);
+                                  return nterm;
+                                }
+                              }
+                         }      
+                       }
                       console.log(t[i].type) ;
                       //if((t[i].type=="INTEGER")||(t[i].type=="SYMBOL"))  
                         atom=evalForm(t,env,i);
