@@ -79,17 +79,17 @@ var readAtom = function (input){
                               
                 if(input[I]==nil)
                  {//console.log("readAtom: NIL "+input[I]);
-                  var r={type: "NIL", value: "nil" };
+                  var r={type: "BOOLEAN", value: "false" };
                   return r;
                  }  
                 if(input[I]=="t")
                  {//console.log("readAtom: TRUE ");
-                  var r={type: "TRUE", value: true };
+                  var r={type: "BOOLEAN", value: true };
                   return r;
                  }   
                 if(input[I]=="f")
                  {//console.log("readAtom: FALSE ");
-                  var r={type: "FALSE", value: false };
+                  var r={type: "BOOLEAN", value: false };
                   return r;
                  }   
                 if(number.test(input[I]))
