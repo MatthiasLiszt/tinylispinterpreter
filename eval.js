@@ -28,12 +28,14 @@ replEnv['t']=function(){return {type: "BOOLEAN", value: true};}
 replEnv['f']=function(){return {type: "BOOLEAN", value: false};}
 replEnv['nil']=function(){return {type: "BOOLEAN", value: false};}
 
+replEnv['quote']=function(){return 0;};// not to be executed
+
 environment.push(replEnv);
 
 // after days of disappointment I finally decided to somehow copy the reader functions
 var evaluate = function (t,env){
-                 
-                                                  
+               var qDetected=false;
+                                                                 
                  function evalForm(t,env,i){
                   
                   if(t[i]!==undefined)
@@ -72,12 +74,18 @@ var evaluate = function (t,env){
                    var atom;
                    var i=0,el;
                    
+                                 
                   while(t[i]!==undefined)  
                    {el=t[i];
+                     
+                    if(el.value=='quote'){qDetected=true;
+                                          console.log(" quote found !!!");
+                                         }
+
                     if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
                      {var pval=environment[env][el.value];
                       console.log("function found "+el.value)
-                      if(isExecutable(t))
+                      if(isExecutable(t,qDetected))
                        {console.log("executable");
                         printList(t);
                         if(t.length==1) // parameterless function or variable
@@ -179,9 +187,8 @@ var evaluate = function (t,env){
                   var nevv=evalList(old,env);
                  }  
                                              
-                //var old=evalList(nevv,env);    
-                //console.log("no further simplifications possible");
-                return old;                 
+                return old;                
+                //return evalList(nevv,env);   
                };
 
 
@@ -199,10 +206,17 @@ function getNextList(x){
 }
 
 
-function isExecutable(x){ // checks if there are no more "nested" parameters 
+function isExecutable(x,q){ // checks if there are no more "nested" parameters 
   var i=0;
+  var qDetected=q;
  
   console.log("executing isExecutable x.length "+x.length); 
+
+  if(qDetected)
+   {qDetected=false;
+    console.log("! ! ! quote detected ! ! !");
+    return false;
+   }  
  
   for(i=0;i<x.length;++i)
    {if(Array.isArray(x[i])){return false;}
