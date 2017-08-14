@@ -9,11 +9,14 @@ var reader = require("./reader")
 repl.start({
      prompt: "code>" ,
      eval: function(cmd, context, filename, callback){
+                     var r;
+
                      console.log("to be processed "+cmd);
                      var p=reader.readString(cmd);
                      //reader.printString();
                      console.log("from REPL : "+JSON.stringify(p)); 
-                     eval.evaluate(p,0);
+                     r=eval.evaluate(p,0);
+                     console.log("evaluate return value: "+JSON.stringify(r));
                      callback(null); // 2b changed
            } 
 });
