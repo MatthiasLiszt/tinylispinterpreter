@@ -216,24 +216,15 @@ var evaluate = function (t,env){
                  }
 
                 var nevv=t;
-                t
+                
                 for(var i=0;i<t.length;++i) 
                  {var old=evalList(nevv,env);
                   var nevv=evalList(old,env);
                  }  
-<<<<<<< HEAD
                                        
                 deQuote=true;  
                 return evalList(old,env);                
                 
-=======
-
-                //console.log("deQuote: "+JSON.stringify(deQuote(old)));
-                if(qDetected)
-                 {return deQuote(old);}                             
-                return old;                
-
->>>>>>> 02dcf15938a5de514aa98cb1cd9dc6224701a0fc
                };
 
 
@@ -250,9 +241,6 @@ function getNextList(x){
  return undefined; // returns undefined when there is no other list
 }
 
-function deQuote(x){//returns a quoted statement
- return x[1];
-}
 
 function isExecutable(x,q){ // checks if there are no more "nested" parameters 
   var i=0;
