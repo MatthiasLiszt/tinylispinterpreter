@@ -28,13 +28,14 @@ replEnv['t']=function(){return {type: "BOOLEAN", value: true};}
 replEnv['f']=function(){return {type: "BOOLEAN", value: false};}
 replEnv['nil']=function(){return {type: "BOOLEAN", value: false};}
 
-replEnv['quote']=function(){return 0;};// not to be executed
+//replEnv['quote']=function(){return 0;};// not to be executed 
 
 environment.push(replEnv);
 
 // after days of disappointment I finally decided to somehow copy the reader functions
 var evaluate = function (t,env){
                var qDetected=false;
+               var deQuote=false; // deQuote switch 
                                                                  
                  function evalForm(t,env,i){
                   
@@ -81,7 +82,7 @@ var evaluate = function (t,env){
                     if(el.value=='quote'){qDetected=true;
                                           console.log(" quote found !!!");
                                          }
-
+                    
                     if((el.type=="SYMBOL")&&(envFind(el.value,env)!="error!"))
                      {var pval=environment[env][el.value];
                       console.log("function found "+el.value)
@@ -95,7 +96,8 @@ var evaluate = function (t,env){
                           console.log("variable detected");                 
                           console.log("nxp "+JSON.stringify(nxp));
                           return nterm;
-                         }    
+                         }   
+                        
                         if(t.length==3)  // to be changed ; for 2 arguments only
                          {var a,b;
                           if(t[1].type=="SYMBOL"){a=environment[env][t[1].value];
@@ -125,13 +127,46 @@ var evaluate = function (t,env){
                        } 
                      }  
                     else 
-                     {if(el.value=="define")
+                     {if((el.value=="quote")&&deQuote)
+                       {console.log("deQuote mode on ... quote detected");
+                        nterm.push(t[1]);
+                        deQuote=false;
+                        i=i+2;
+                        console.log("nterm "+JSON.stringify(nterm));
+                        return nterm;
+                       }
+                      if(el.value=="define")
                        {console.log("define detected");
-                        envSet(t[1].value,t[2].value,env);
+                        if(Array.isArray(t[2]))
+                         {var tC=t[2];
+                          if(tC[0].value=="quote")
+                           {var tS=tC[1];
+                            console.log("parameter deQuoted !!! "); 
+                           } 
+                          else
+                           {var tS=t[2];}
+                          console.log("!!! t[2] is an array");
+                          console.log("!!! content "+JSON.stringify(tS));
+                          console.log("!!! type "+tS.type);
+                          console.log("!!! value "+tS.value);
+                          if(Array.isArray(tS))
+                           {envSet(t[1].value,tS,env);}
+                          else
+                           {envSet(t[1].value,tS.value,env);}
+                         }   
+                        else
+                         {envSet(t[1].value,t[2].value,env);}
                         nterm.push(t[2]);
                         i+=3;
                         return nterm;
                        } 
+                      if (el.value=="car")
+                       {console.log("car detected --- param "+t[1].value);
+                        var car=environment[env][t[1].value]; 
+                        console.log("possible return: "+JSON.stringify(car));
+                        i=i+2;
+                        return nterm.push(car[0].value);
+                       }
                       if (el.value=="if")
                        {console.log("define if");
                         if(t[1].value===undefined)
@@ -186,9 +221,10 @@ var evaluate = function (t,env){
                  {var old=evalList(nevv,env);
                   var nevv=evalList(old,env);
                  }  
-                                             
-                return old;                
-                //return evalList(nevv,env);   
+                                       
+                deQuote=true;  
+                return evalList(old,env);                
+                
                };
 
 
@@ -244,6 +280,10 @@ function envSet(s,m,e){var number=/^-?[0-9]+$/;
                          environment[e][s]=xp;
                          return xp;
                         }
+                       if(Array.isArray(m))
+                        {environment[e][s]=m; //already in the right format 
+                         return m;
+                        }  
                        console.log("type not supported!");   
                        return "error!";
                       }
@@ -279,6 +319,7 @@ function isAtom(x){
 function isBoolean(val) {
    return (val === false || val === true);
 }
+
 
 
 module.exports = ({evaluate: evaluate});
