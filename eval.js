@@ -175,24 +175,83 @@ var evaluate = function (t,env){
                        } 
                       if(el.value=="car")
                        {console.log("car detected --- param "+t[1].value);
-                        var car=environment[env][t[1].value]; 
-                        console.log("possible return: "+JSON.stringify(car));
-                        i=i+2;
-                        var ccar=car[0];
-                        console.log("ccar "+JSON.stringify(ccar));
-                        nterm.push(ccar);
-                        return nterm;
+                        var carExecute=false;  
+                        if(Array.isArray(t[1]))
+                         {//console.log("car not yet executable");
+                          var check=t[1];
+                          if(check[0].type!="SYMBOL")
+                           {console.log("car probably executable");
+                            carExecute=true;
+                            var car=t[1]; 
+                           } 
+                         }
+                        else
+                         {var car=environment[env][t[1].value];
+                          carExecute=true;
+                         }
+                        if(carExecute)   
+                         {console.log("possible return: "+JSON.stringify(car));
+                          i=i+2;
+                          var ccar=car[0];
+                          console.log("ccar "+JSON.stringify(ccar));
+                          nterm.push(ccar);
+                          return nterm;
+                         }  
+                        else
+                          {console.log("car not yet executed");} 
                        }
                       if(el.value=="cdr")
                        {console.log("cdr detected --- param "+t[1].value);
-                        var cdr=environment[env][t[1].value]; 
-                        i=i+2;
-                        var prrr=[];
-                        for(var j=1;j<cdr.length;++j)
-                         {prrr.push(cdr[j]);
-                          nterm.push(cdr[j]);}
-                        console.log("possible return: "+JSON.stringify(prrr));
-                        return nterm;
+                        var cdrExecute=false;
+                        if(Array.isArray(t[1]))
+                         {var check=t[1];
+                          if(check[0].type!="SYMBOL")
+                           {console.log("cdr probably executable");
+                            cdrExecute=true;
+                            var cdr=t[1]; 
+                           } 
+                         }  
+                        else
+                         {var cdr=environment[env][t[1].value];
+                          cdrExecute=true;
+                         }
+                        if(cdrExecute)
+                         {i=i+2;
+                          var prrr=[];
+                          for(var j=1;j<cdr.length;++j)
+                           {prrr.push(cdr[j]);
+                            nterm.push(cdr[j]);}
+                          console.log("possible return: "+JSON.stringify(prrr));
+                          return nterm;
+                         } 
+                        else
+                         {console.log("cdr not yet executed");}
+                       }
+                      if(el.value=="cons")
+                       {console.log("cons detected ");
+                        var consExecute=0;
+                        if(checkCons(t[1])){++consExecute;cons1=t[1];}
+                        if(checkCons(t[2])){++consExecute;cons2=t[2];}
+                        if(!Array.isArray(t[1]))
+                         {++consExecute;environment[env][t[1].value];}
+                        if(!Array.isArray(t[2]))
+                         {++consExecute;environment[env][t[2].value];} 
+                        if(consExecute==2)                        
+                         {var prrr=[];
+                          prrr.push(cons1);
+                          prrr.push(cons2);
+                          nterm.push(prrr);
+                          console.log("possible return: "+JSON.stringify(prrr));
+                          return nterm;
+                         }
+                        function checkCons(x)
+                         {if(Array.isArray(x))
+                           {var check=x;
+                            if(check[0].type!="SYMBOL"){return true;}
+                           } 
+                          return false;
+                         }
+                        
                        }
                       if (el.value=="if")
                        {console.log("define if");
@@ -200,7 +259,7 @@ var evaluate = function (t,env){
                          {console.log("if is not yet executable ");}
                         else
                          {if(t[1].type=="BOOLEAN")
-                            { console.log("if is probably exectuable");
+                            { console.log("if is probably executable");
                                console.log("simplified if condition "+t[1].value);
                                if(t[1].value==false)
                                  {console.log("if condition is FALSE");
