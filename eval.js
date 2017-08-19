@@ -97,6 +97,19 @@ var evaluate = function (t,env){
                           console.log("nxp "+JSON.stringify(nxp));
                           return nterm;
                          }   
+                        if(t.length==2) // single parameter functions
+                         {var a;
+                          if(t[1].type=="SYMBOL"){a=environment[env][t[1].value];
+                                                  a=a.value;}
+                          if(t[1].type=="INTEGER"){a=t[1].value;}      
+                          if(t[1].type=="BOOLEAN"){a=t[1].value;}      
+                          
+                          var nxp;
+                          nxp=pval(a,b);
+                          nterm.push(nxp);
+                          console.log("nxp "+JSON.stringify(nxp));
+                          i+=2;
+                         } 
                         
                         if(t.length==3)  // to be changed ; for 2 arguments only
                          {var a,b;
@@ -160,12 +173,26 @@ var evaluate = function (t,env){
                         i+=3;
                         return nterm;
                        } 
-                      if (el.value=="car")
+                      if(el.value=="car")
                        {console.log("car detected --- param "+t[1].value);
                         var car=environment[env][t[1].value]; 
                         console.log("possible return: "+JSON.stringify(car));
                         i=i+2;
-                        return nterm.push(car[0].value);
+                        var ccar=car[0];
+                        console.log("ccar "+JSON.stringify(ccar));
+                        nterm.push(ccar);
+                        return nterm;
+                       }
+                      if(el.value=="cdr")
+                       {console.log("cdr detected --- param "+t[1].value);
+                        var cdr=environment[env][t[1].value]; 
+                        i=i+2;
+                        var prrr=[];
+                        for(var j=1;j<cdr.length;++j)
+                         {prrr.push(cdr[j]);
+                          nterm.push(cdr[j]);}
+                        console.log("possible return: "+JSON.stringify(prrr));
+                        return nterm;
                        }
                       if (el.value=="if")
                        {console.log("define if");
